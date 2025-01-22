@@ -32,7 +32,7 @@ use tari_common_types::types::PublicKey;
 use tari_dan_common_types::{substate_type::SubstateType, Epoch, SubstateAddress, SubstateRequirement};
 use tari_dan_wallet_sdk::{
     apis::{confidential_transfer::ConfidentialTransferInputSelection, jwt::Claims, key_manager},
-    models::{Account, ConfidentialProofId, NonFungibleToken, TransactionStatus},
+    models::{Account, ConfidentialProofId, NonFungibleToken, TransactionStatus, VaultModel},
 };
 use tari_engine_types::{
     commit_result::{ExecuteResult, FinalizeResult},
@@ -742,6 +742,27 @@ pub struct ConfidentialTransferResponse {
     pub transaction_id: TransactionId,
     pub fee: Amount,
     pub result: FinalizeResult,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(TS),
+    ts(export, export_to = "../../bindings/src/types/wallet-daemon-client/")
+)]
+pub struct VaultGetRequest {
+    #[serde(deserialize_with = "string_or_struct")]
+    pub vault_id: VaultId,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+// #[cfg_attr(
+//     feature = "ts",
+//     derive(TS),
+//     ts(export, export_to = "../../bindings/src/types/wallet-daemon-client/")
+// )]
+pub struct VaultGetResponse {
+    pub vault: VaultModel,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

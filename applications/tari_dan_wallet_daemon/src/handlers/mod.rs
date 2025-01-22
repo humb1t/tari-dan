@@ -14,6 +14,7 @@ pub mod substates;
 pub mod templates;
 pub mod transaction;
 pub mod validator;
+pub mod vaults;
 pub mod webrtc;
 
 use std::future::Future;

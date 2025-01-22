@@ -13,10 +13,7 @@ use axum::{
 };
 use axum_jrpc::{
     error::{JsonRpcError, JsonRpcErrorReason},
-    JrpcResult,
-    JsonRpcAnswer,
-    JsonRpcExtractor,
-    JsonRpcResponse,
+    JrpcResult, JsonRpcAnswer, JsonRpcExtractor, JsonRpcResponse,
 };
 use log::*;
 use serde::{de::DeserializeOwned, Serialize};
@@ -28,16 +25,7 @@ use tower_http::{cors::CorsLayer, trace::TraceLayer};
 
 use super::handlers::{substates, templates, HandlerContext};
 use crate::handlers::{
-    accounts,
-    confidential,
-    error::HandlerError,
-    keys,
-    nfts,
-    rpc,
-    settings,
-    transaction,
-    validator,
-    webrtc,
+    accounts, confidential, error::HandlerError, keys, nfts, rpc, settings, transaction, validator, vaults, webrtc,
     Handler,
 };
 
@@ -150,6 +138,10 @@ async fn handler(
             "create_free_test_coins" => {
                 call_handler(context, value, token, accounts::handle_create_free_test_coins).await
             },
+            _ => Ok(value.method_not_found(&value.method)),
+        },
+        Some(("vaults", method)) => match method {
+            "get" => call_handler(context, value, token, vaults::handle_vaults_get).await,
             _ => Ok(value.method_not_found(&value.method)),
         },
         Some(("confidential", method)) => match method {

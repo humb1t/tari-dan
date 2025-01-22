@@ -132,7 +132,7 @@ impl<'a, TStore: WalletStore> AccountsApi<'a, TStore> {
         Ok(vault)
     }
 
-    pub fn get_vault(&self, vault_addr: &&SubstateId) -> Result<VaultModel, AccountsApiError> {
+    pub fn get_vault(&self, vault_addr: &SubstateId) -> Result<VaultModel, AccountsApiError> {
         let mut tx = self.store.create_read_tx()?;
         let vault = tx.vaults_get(vault_addr)?;
         Ok(vault)

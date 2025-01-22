@@ -33,99 +33,44 @@ use std::{
 use json::Value;
 use reqwest::{
     header::{self, HeaderMap, AUTHORIZATION},
-    IntoUrl,
-    Url,
+    IntoUrl, Url,
 };
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json as json;
 use serde_json::json;
-use tari_template_lib::models::ComponentAddress;
+use tari_template_lib::{models::ComponentAddress, prelude::VaultId};
 #[cfg(feature = "ts")]
 use ts_rs::TS;
 use types::{
-    AccountsCreateFreeTestCoinsRequest,
-    AccountsCreateFreeTestCoinsResponse,
-    AccountsTransferRequest,
-    AccountsTransferResponse,
-    AuthLoginAcceptRequest,
-    AuthLoginAcceptResponse,
-    AuthLoginDenyRequest,
-    AuthLoginDenyResponse,
-    AuthLoginRequest,
-    AuthLoginResponse,
-    ClaimBurnRequest,
-    ClaimBurnResponse,
-    GetAccountNftRequest,
-    GetAccountNftResponse,
-    ListAccountNftRequest,
-    ListAccountNftResponse,
-    MintAccountNftRequest,
-    MintAccountNftResponse,
-    ProofsCancelRequest,
-    ProofsCancelResponse,
-    ProofsFinalizeRequest,
-    ProofsFinalizeResponse,
-    ProofsGenerateRequest,
-    ProofsGenerateResponse,
-    WebRtcStartRequest,
-    WebRtcStartResponse,
+    AccountsCreateFreeTestCoinsRequest, AccountsCreateFreeTestCoinsResponse, AccountsTransferRequest,
+    AccountsTransferResponse, AuthLoginAcceptRequest, AuthLoginAcceptResponse, AuthLoginDenyRequest,
+    AuthLoginDenyResponse, AuthLoginRequest, AuthLoginResponse, ClaimBurnRequest, ClaimBurnResponse,
+    GetAccountNftRequest, GetAccountNftResponse, ListAccountNftRequest, ListAccountNftResponse, MintAccountNftRequest,
+    MintAccountNftResponse, ProofsCancelRequest, ProofsCancelResponse, ProofsFinalizeRequest, ProofsFinalizeResponse,
+    ProofsGenerateRequest, ProofsGenerateResponse, WebRtcStartRequest, WebRtcStartResponse,
 };
 
 use crate::{
     error::WalletDaemonClientError,
     types::{
-        AccountGetDefaultRequest,
-        AccountGetRequest,
-        AccountGetResponse,
-        AccountSetDefaultRequest,
-        AccountSetDefaultResponse,
-        AccountsCreateRequest,
-        AccountsCreateResponse,
-        AccountsGetBalancesRequest,
-        AccountsGetBalancesResponse,
-        AccountsInvokeRequest,
-        AccountsInvokeResponse,
-        AccountsListRequest,
-        AccountsListResponse,
-        AuthGetAllJwtRequest,
-        AuthGetAllJwtResponse,
-        AuthRevokeTokenRequest,
-        AuthRevokeTokenResponse,
-        ClaimValidatorFeesRequest,
-        ClaimValidatorFeesResponse,
-        ConfidentialCreateOutputProofRequest,
-        ConfidentialCreateOutputProofResponse,
-        ConfidentialTransferRequest,
-        ConfidentialTransferResponse,
-        ConfidentialViewVaultBalanceRequest,
-        ConfidentialViewVaultBalanceResponse,
-        GetValidatorFeesRequest,
-        GetValidatorFeesResponse,
-        KeyBranch,
-        KeysCreateRequest,
-        KeysCreateResponse,
-        KeysListRequest,
-        KeysListResponse,
-        KeysSetActiveRequest,
-        KeysSetActiveResponse,
-        PublishTemplateRequest,
-        PublishTemplateResponse,
-        RevealFundsRequest,
-        RevealFundsResponse,
-        TransactionGetAllRequest,
-        TransactionGetAllResponse,
-        TransactionGetRequest,
-        TransactionGetResponse,
-        TransactionGetResultRequest,
-        TransactionGetResultResponse,
-        TransactionSubmitDryRunRequest,
-        TransactionSubmitDryRunResponse,
-        TransactionSubmitRequest,
-        TransactionSubmitResponse,
-        TransactionWaitResultRequest,
+        AccountGetDefaultRequest, AccountGetRequest, AccountGetResponse, AccountSetDefaultRequest,
+        AccountSetDefaultResponse, AccountsCreateRequest, AccountsCreateResponse, AccountsGetBalancesRequest,
+        AccountsGetBalancesResponse, AccountsInvokeRequest, AccountsInvokeResponse, AccountsListRequest,
+        AccountsListResponse, AuthGetAllJwtRequest, AuthGetAllJwtResponse, AuthRevokeTokenRequest,
+        AuthRevokeTokenResponse, ClaimValidatorFeesRequest, ClaimValidatorFeesResponse,
+        ConfidentialCreateOutputProofRequest, ConfidentialCreateOutputProofResponse, ConfidentialTransferRequest,
+        ConfidentialTransferResponse, ConfidentialViewVaultBalanceRequest, ConfidentialViewVaultBalanceResponse,
+        GetValidatorFeesRequest, GetValidatorFeesResponse, KeyBranch, KeysCreateRequest, KeysCreateResponse,
+        KeysListRequest, KeysListResponse, KeysSetActiveRequest, KeysSetActiveResponse, PublishTemplateRequest,
+        PublishTemplateResponse, RevealFundsRequest, RevealFundsResponse, TransactionGetAllRequest,
+        TransactionGetAllResponse, TransactionGetRequest, TransactionGetResponse, TransactionGetResultRequest,
+        TransactionGetResultResponse, TransactionSubmitDryRunRequest, TransactionSubmitDryRunResponse,
+        TransactionSubmitRequest, TransactionSubmitResponse, TransactionWaitResultRequest,
         TransactionWaitResultResponse,
     },
 };
+
+use self::types::{VaultGetRequest, VaultGetResponse};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(
@@ -223,10 +168,13 @@ impl WalletDaemonClient {
     // }
 
     pub async fn create_key(&mut self, branch: KeyBranch) -> Result<KeysCreateResponse, WalletDaemonClientError> {
-        self.send_request("keys.create", &KeysCreateRequest {
-            branch,
-            specific_index: None,
-        })
+        self.send_request(
+            "keys.create",
+            &KeysCreateRequest {
+                branch,
+                specific_index: None,
+            },
+        )
         .await
     }
 
@@ -235,10 +183,13 @@ impl WalletDaemonClient {
         branch: KeyBranch,
         index: u64,
     ) -> Result<KeysCreateResponse, WalletDaemonClientError> {
-        self.send_request("keys.create", &KeysCreateRequest {
-            branch,
-            specific_index: Some(index),
-        })
+        self.send_request(
+            "keys.create",
+            &KeysCreateRequest {
+                branch,
+                specific_index: Some(index),
+            },
+        )
         .await
     }
 
@@ -442,6 +393,10 @@ impl WalletDaemonClient {
         req: T,
     ) -> Result<ListAccountNftResponse, WalletDaemonClientError> {
         self.send_request("nfts.list", req.borrow()).await
+    }
+
+    pub async fn vaults_get(&mut self, vault_id: VaultId) -> Result<VaultGetResponse, WalletDaemonClientError> {
+        self.send_request("vaults.get", &VaultGetRequest { vault_id }).await
     }
 
     pub async fn view_vault_balance<T: Borrow<ConfidentialViewVaultBalanceRequest>>(
